@@ -1,0 +1,58 @@
+# complied binary
+flights
+
+# Binaries for programs and plugins
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.coverprofile
+
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
+*.swo
+*.bak
+*.old
+
+# Directories
+bin/
+build/
+dist/
+release/
+
+# Dependency directories (note that in module mode, these shouldn't be needed)
+vendor/
+
+# IDE/Editor-specific files
+.idea/
+.vscode/
+*.iml
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+# Go Modules
+/go.sum
+/go.work
+/go.work.sum
+
+# Generated files
+*.gen.go
+
+# Test artifacts
+*.test
+*.prof
+
+# Configuration files
+.env
+.env.*
+
+# Custom or project-specific files
+# Add here any custom patterns specific to your project.
