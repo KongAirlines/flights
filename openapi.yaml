@@ -9,7 +9,7 @@ info:
 
 servers:
 - url: https://api.kong-air.com
-  description: KongAir API Server
+  description: KongAir API Server 
 
 paths:
   /health:
