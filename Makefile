@@ -7,6 +7,7 @@ test: check-dependencies
 	go test -v ./...
 
 build: check-dependencies
+	go generate ./...
 	go build .
 
 run: check-dependencies build
