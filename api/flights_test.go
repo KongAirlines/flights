@@ -1,12 +1,12 @@
 package api_test
 
 import (
-	"testing"
 	"net/http"
 	"net/http/httptest"
+	"testing"
 
-	"github.com/Kong/KongAir/flight-data/flights/api"
-	"github.com/Kong/KongAir/flight-data/flights/api/models"
+	"github.com/KongAirlines/flights/api"
+	"github.com/KongAirlines/flights/api/models"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 )
@@ -92,4 +92,3 @@ func TestGetFlightDetails(t *testing.T) {
 	// Assert that the response status code is 200
 	assert.Equal(t, http.StatusOK, rec.Code)
 }
-

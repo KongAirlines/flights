@@ -1,22 +1,23 @@
-//go:generate go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen --config=models.cfg.yaml ../openapi.yaml
-//go:generate go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen --config=server.cfg.yaml ../openapi.yaml
+//go:generate go run github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen --config=models.cfg.yaml ../openapi.yaml
+//go:generate go run github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen --config=server.cfg.yaml ../openapi.yaml
 
 package api
 
 import (
 	"time"
 
-	"github.com/Kong/KongAir/flight-data/flights/api/models"
+	"net/http"
+	"os"
+
+	"github.com/KongAirlines/flights/api/models"
 	"github.com/labstack/echo/v4"
-  "net/http"
-  "os"
 )
 
 func stringPtr(str string) *string {
 	return &str
 }
 func boolPtr(b bool) *bool {
-  return &b
+	return &b
 }
 
 func generateSampleFlightDetails() []models.FlightDetails {
@@ -25,61 +26,61 @@ func generateSampleFlightDetails() []models.FlightDetails {
 			AircraftType:          "Boeing 777",
 			FlightNumber:          "KA0284",
 			InFlightEntertainment: true,
-			MealOptions:           &[]string{"Chicken", "Fish", "Vegetarian"},
+			MealOptions:           []string{"Chicken", "Fish", "Vegetarian"},
 		},
 		{
 			AircraftType:          "Airbus A380",
 			FlightNumber:          "KA0285",
 			InFlightEntertainment: true,
-			MealOptions:           &[]string{"Vegetarian", "Beef"},
+			MealOptions:           []string{"Vegetarian", "Beef"},
 		},
 		{
 			AircraftType:          "Boeing 777",
 			FlightNumber:          "KA0286",
 			InFlightEntertainment: true,
-			MealOptions:           &[]string{"Chicken", "Fish", "Vegetarian"},
+			MealOptions:           []string{"Chicken", "Fish", "Vegetarian"},
 		},
 		{
 			AircraftType:          "Airbus A380",
 			FlightNumber:          "KA0287",
 			InFlightEntertainment: true,
-			MealOptions:           &[]string{"Vegetarian", "Beef"},
+			MealOptions:           []string{"Vegetarian", "Beef"},
 		},
 		{
 			AircraftType:          "Boeing 777",
 			FlightNumber:          "KA0288",
 			InFlightEntertainment: true,
-			MealOptions:           &[]string{"Chicken", "Fish", "Vegetarian"},
+			MealOptions:           []string{"Chicken", "Fish", "Vegetarian"},
 		},
 		{
 			AircraftType:          "Airbus A380",
 			FlightNumber:          "KA0289",
 			InFlightEntertainment: true,
-			MealOptions:           &[]string{"Vegetarian", "Beef"},
+			MealOptions:           []string{"Vegetarian", "Beef"},
 		},
 		{
 			AircraftType:          "Boeing 777",
 			FlightNumber:          "KA0290",
 			InFlightEntertainment: true,
-			MealOptions:           &[]string{"Chicken", "Fish", "Vegetarian"},
+			MealOptions:           []string{"Chicken", "Fish", "Vegetarian"},
 		},
 		{
 			AircraftType:          "Airbus A380",
 			FlightNumber:          "KA0291",
 			InFlightEntertainment: true,
-			MealOptions:           &[]string{"Vegetarian", "Beef"},
+			MealOptions:           []string{"Vegetarian", "Beef"},
 		},
 		{
 			AircraftType:          "Boeing 777",
 			FlightNumber:          "KA0292",
 			InFlightEntertainment: true,
-			MealOptions:           &[]string{"Chicken", "Fish", "Vegetarian"},
+			MealOptions:           []string{"Chicken", "Fish", "Vegetarian"},
 		},
 		{
 			AircraftType:          "Airbus A380",
 			FlightNumber:          "KA0293",
 			InFlightEntertainment: true,
-			MealOptions:           &[]string{"Vegetarian", "Beef"},
+			MealOptions:           []string{"Vegetarian", "Beef"},
 		},
 	}
 	return details
@@ -87,8 +88,8 @@ func generateSampleFlightDetails() []models.FlightDetails {
 
 func NewFlight(number, routeId string, scheduledArrival, scheduledDeparture time.Time) models.Flight {
 	return models.Flight{
-		Number: number,
-		RouteId: routeId,
+		Number:             number,
+		RouteId:            routeId,
 		ScheduledArrival:   scheduledArrival,
 		ScheduledDeparture: scheduledDeparture,
 	}
@@ -140,14 +141,14 @@ func generateSampleFlights() []models.Flight {
 }
 
 type FlightService struct {
-	Flights []models.Flight
-  FlightDetails []models.FlightDetails
+	Flights       []models.Flight
+	FlightDetails []models.FlightDetails
 }
 
 func NewFlightService() *FlightService {
 	rv := FlightService{}
 	rv.Flights = generateSampleFlights()
-  rv.FlightDetails = generateSampleFlightDetails()
+	rv.FlightDetails = generateSampleFlightDetails()
 	return &rv
 }
 
@@ -157,9 +158,9 @@ func (s *FlightService) GetHealth(ctx echo.Context) error {
 	if err != nil {
 		return err
 	}
-  ctx.Response().Header().Set("Hostname", hostname)
+	ctx.Response().Header().Set("Hostname", hostname)
 
-  return ctx.JSON(http.StatusOK, map[string]string{"status": "OK"})
+	return ctx.JSON(http.StatusOK, map[string]string{"status": "OK"})
 }
 
 func (s *FlightService) GetFlights(ctx echo.Context, params models.GetFlightsParams) error {
@@ -168,7 +169,7 @@ func (s *FlightService) GetFlights(ctx echo.Context, params models.GetFlightsPar
 	if err != nil {
 		return err
 	}
-  ctx.Response().Header().Set("Hostname", hostname)
+	ctx.Response().Header().Set("Hostname", hostname)
 
 	return ctx.JSON(http.StatusOK, s.Flights)
 }
@@ -176,16 +177,16 @@ func (s *FlightService) GetFlightByNumber(ctx echo.Context, flightNumber string)
 
 	for _, flight := range s.Flights {
 		if flight.Number == flightNumber {
-	    hostname, err := os.Hostname()
-	    if err != nil {
-	    	return err
-	    }
-      ctx.Response().Header().Set("Hostname", hostname)
+			hostname, err := os.Hostname()
+			if err != nil {
+				return err
+			}
+			ctx.Response().Header().Set("Hostname", hostname)
 			return ctx.JSON(http.StatusOK, flight)
 		}
 	}
 
-  // Include the hostname header in the response
+	// Include the hostname header in the response
 	return ctx.JSON(http.StatusNotFound, map[string]string{"message": "Flight not found"})
 }
 
@@ -193,11 +194,11 @@ func (s *FlightService) GetFlightDetails(ctx echo.Context, flightNumber string) 
 
 	for _, flight := range s.FlightDetails {
 		if flight.FlightNumber == flightNumber {
-	    hostname, err := os.Hostname()
-	    if err != nil {
-	    	return err
-	    }
-      ctx.Response().Header().Set("Hostname", hostname)
+			hostname, err := os.Hostname()
+			if err != nil {
+				return err
+			}
+			ctx.Response().Header().Set("Hostname", hostname)
 			return ctx.JSON(http.StatusOK, flight)
 		}
 	}
