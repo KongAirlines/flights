@@ -11,13 +11,13 @@ build: check-dependencies
 	go build .
 
 build-docker:
-	@docker build -t kong-air-flights-svc:dev .
+	@docker build -t kongair/flights:latest .
 
 run: check-dependencies build
 	./flights ${KONG_AIR_FLIGHTS_PORT}
 
 docker: build-docker
-	@docker run -d --name kong-air-flights-svc -p ${KONG_AIR_FLIGHTS_PORT}:${KONG_AIR_FLIGHTS_PORT} kong-air-flights-svc:dev
+	@docker run -d --name kongair-flights -p ${KONG_AIR_FLIGHTS_PORT}:${KONG_AIR_FLIGHTS_PORT} kongair/flights:latest
 
 kill-docker:
 	-@docker stop kong-air-flights-svc
