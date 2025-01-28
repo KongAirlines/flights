@@ -3,6 +3,10 @@
 Provides the KongAir flights information including
 flight number and other details.
 
+### Security
+
+See [Security](SECURITY.md) for information on how to report security vulnerabilities.
+
 ### Specification
 
 The API specification can be found in the [openapi.yaml](openapi.yaml) file.
