@@ -8,7 +8,7 @@ info:
   title: Flights Service
 
 servers:
-- url: https://api.kong-air.com
+- url: https://api-2.kong-air.com
   description: KongAir API Server
 
 paths:
