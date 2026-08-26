@@ -1,0 +1,38 @@
+name: Apply development desired state
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - gateway/dev/**
+      - konnect/dev.yaml
+      - openapi.yaml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: flights-development
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    environment: development
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Install kongctl
+        uses: Kong/setup-kongctl@659d5c2b0f4db2e25d63797035358a22907421db # v1
+        with:
+          kongctl-version: "1.14.0"
+      - name: Install decK
+        uses: Kong/setup-deck@6ea0a466ee5826ddb531cbe851ba8e5a77a0e041 # v1
+        with:
+          deck-version: "1.65.2"
+          wrapper: false
+      - name: Apply development Catalog and Gateway state
+        env:
+          KONGCTL_DEFAULT_KONNECT_PAT: ${{ secrets.KONNECT_TOKEN }}
+        run: kongctl apply -f konnect/dev.yaml --base-dir . --require-namespace flights-dev

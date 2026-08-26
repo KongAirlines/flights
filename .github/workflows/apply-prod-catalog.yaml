@@ -1,0 +1,33 @@
+name: Apply production Catalog state
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_commit:
+        description: Service commit whose Gateway artifact was promoted
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ inputs.source_commit }}
+      - name: Verify the selected commit
+        env:
+          EXPECTED_COMMIT: ${{ inputs.source_commit }}
+        run: test "$(git rev-parse HEAD)" = "${EXPECTED_COMMIT}"
+      - name: Install kongctl
+        uses: Kong/setup-kongctl@659d5c2b0f4db2e25d63797035358a22907421db # v1
+        with:
+          kongctl-version: "1.14.0"
+      - name: Apply production Catalog state
+        env:
+          KONGCTL_DEFAULT_KONNECT_PAT: ${{ secrets.KONNECT_TOKEN }}
+        run: kongctl apply -f konnect/prod.yaml --base-dir . --require-namespace flights-prod

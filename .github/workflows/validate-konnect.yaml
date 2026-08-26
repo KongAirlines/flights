@@ -1,0 +1,35 @@
+name: Validate Konnect desired state
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/**
+      - gateway/**
+      - konnect/**
+      - openapi.yaml
+      - openapi/**
+      - scripts/**
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Install decK
+        uses: Kong/setup-deck@6ea0a466ee5826ddb531cbe851ba8e5a77a0e041 # v1
+        with:
+          deck-version: "1.65.2"
+          wrapper: false
+      - name: Regenerate Gateway state
+        run: ./scripts/generate-gateway.sh
+      - name: Check generated state is committed
+        run: git diff --exit-code -- gateway
+      - name: Enforce Reference Platform ownership rules
+        run: ./scripts/lint-reference-platform.sh
+      - name: Validate Gateway state
+        run: |
+          deck file validate gateway/dev/kong.yaml
+          deck file validate gateway/prod/kong.yaml
