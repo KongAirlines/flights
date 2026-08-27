@@ -30,4 +30,4 @@ jobs:
       - name: Apply production Catalog state
         env:
           KONGCTL_DEFAULT_KONNECT_PAT: ${{ secrets.KONNECT_TOKEN }}
-        run: kongctl apply -f konnect/prod.yaml --base-dir . --require-namespace flights-prod
+        run: kongctl apply -f konnect/prod.yaml --base-dir . --require-namespace flights

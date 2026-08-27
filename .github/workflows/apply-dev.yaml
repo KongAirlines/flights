@@ -35,4 +35,4 @@ jobs:
       - name: Apply development Catalog and Gateway state
         env:
           KONGCTL_DEFAULT_KONNECT_PAT: ${{ secrets.KONNECT_TOKEN }}
-        run: kongctl apply -f konnect/dev.yaml --base-dir . --require-namespace flights-dev
+        run: kongctl apply -f konnect/dev.yaml --base-dir . --require-namespace flights
