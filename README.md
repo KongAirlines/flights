@@ -80,6 +80,5 @@ Install decK 1.65.2 and run `./scripts/generate-gateway.sh` after changing an
 OpenAPI document. Commit the generated development and production files. CI
 regenerates them and rejects drift.
 
-The kongctl manifests intentionally exercise control-plane API implementations.
-They require the corresponding declarative support in kongctl, including
-[Kong/kongctl#1992](https://github.com/Kong/kongctl/pull/1992).
+The kongctl manifests use control-plane API implementations. Use kongctl 1.14.0
+or later when applying them.
