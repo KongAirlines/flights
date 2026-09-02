@@ -13,14 +13,19 @@ on:
         type: string
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
+
+concurrency:
+  group: api-release
+  cancel-in-progress: false
 
 jobs:
   prepare:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: main
       - name: Install decK
         uses: Kong/setup-deck@6ea0a466ee5826ddb531cbe851ba8e5a77a0e041 # v1
         with:
@@ -32,6 +37,7 @@ jobs:
         uses: peter-evans/create-pull-request@22a9089034f40e5a961c8808d113e2c98fb63676 # v7
         with:
           token: ${{ secrets.PLATFORM_PROMOTION_TOKEN }}
+          base: main
           branch: release/${{ inputs.release_version }}
           delete-branch: true
           commit-message: "release: prepare API ${{ inputs.release_version }}"
