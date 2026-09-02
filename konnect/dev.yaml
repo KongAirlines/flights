@@ -18,8 +18,9 @@ apis:
   - ref: flights-dev-api
     name: KongAir Flights - Development
     description: Development Catalog API owned by the Flights service team.
+    version: !file ../openapi.yaml#info.version
     versions:
-      - ref: flights-dev-0-1-0
+      - ref: flights-dev-current
         version: !file ../openapi.yaml#info.version
         spec: !file ../openapi.yaml
     publications:

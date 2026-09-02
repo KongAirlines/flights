@@ -18,6 +18,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
       - name: Install decK
         uses: Kong/setup-deck@6ea0a466ee5826ddb531cbe851ba8e5a77a0e041 # v1
         with:
@@ -28,6 +30,8 @@ jobs:
       - name: Check generated state is committed
         run: git diff --exit-code -- gateway
       - name: Enforce Reference Platform ownership rules
+        env:
+          RELEASE_BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: ./scripts/lint-reference-platform.sh
       - name: Validate Gateway state
         run: |

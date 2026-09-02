@@ -1,0 +1,51 @@
+name: Prepare API release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_version:
+        description: Stable version to release from the matching root beta (for example, 0.2.0)
+        required: true
+        type: string
+      next_development_version:
+        description: Next stable version under development (for example, 0.3.0)
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Install decK
+        uses: Kong/setup-deck@6ea0a466ee5826ddb531cbe851ba8e5a77a0e041 # v1
+        with:
+          deck-version: "1.65.2"
+          wrapper: false
+      - name: Prepare release candidate
+        run: ./scripts/prepare-release.sh "${{ inputs.release_version }}" "${{ inputs.next_development_version }}"
+      - name: Open service release review
+        uses: peter-evans/create-pull-request@22a9089034f40e5a961c8808d113e2c98fb63676 # v7
+        with:
+          token: ${{ secrets.PLATFORM_PROMOTION_TOKEN }}
+          branch: release/${{ inputs.release_version }}
+          delete-branch: true
+          commit-message: "release: prepare API ${{ inputs.release_version }}"
+          title: "release: API ${{ inputs.release_version }}"
+          body: |
+            Prepares API `${{ inputs.release_version }}` for production and
+            advances the root development contract to
+            `${{ inputs.next_development_version }}-beta.1`.
+
+            Merging this PR deploys the next beta to development and opens the
+            governed Platform PR for the generated production Gateway artifact.
+          add-paths: |
+            openapi.yaml
+            openapi/versions/**
+            konnect/prod.yaml
+            gateway/dev/kong.yaml
+            gateway/prod/kong.yaml

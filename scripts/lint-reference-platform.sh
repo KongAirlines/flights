@@ -6,6 +6,8 @@ readonly OWNER="flights"
 readonly SCOPE="flights"
 readonly OBSOLETE_PATTERN='koct[l]|konnect-[o]rchestrator|ko-[p]atch'
 
+./scripts/validate-api-releases.sh "${RELEASE_BASE_SHA:-}"
+
 if grep -q '^[[:space:]]*_deck:' konnect/prod.yaml; then
   echo "production Catalog manifests must not apply Gateway state" >&2
   exit 1

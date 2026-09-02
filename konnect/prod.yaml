@@ -13,6 +13,7 @@ apis:
   - ref: flights-prod-api
     name: KongAir Flights
     description: Production Catalog API owned by the Flights service team.
+    version: 0.1.0
     versions:
       - ref: flights-prod-0-1-0
         version: !file ../openapi/versions/0.1.0.yaml#info.version

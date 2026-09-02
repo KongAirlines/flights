@@ -5,6 +5,18 @@ readonly SERVICE="flights"
 readonly TEAM="flight-data"
 readonly DECK_VERSION="1.65.2"
 
+production_version="$(sed -nE 's/^    version:[[:space:]]*([^[:space:]#]+)[[:space:]]*$/\1/p' konnect/prod.yaml)"
+if [[ -z "${production_version}" || "${production_version}" == *$'\n'* ]]; then
+  echo "konnect/prod.yaml must declare exactly one API-level production version" >&2
+  exit 1
+fi
+readonly PRODUCTION_SPEC="openapi/versions/${production_version}.yaml"
+
+if [[ ! -f "${PRODUCTION_SPEC}" ]]; then
+  echo "production specification ${PRODUCTION_SPEC} does not exist" >&2
+  exit 1
+fi
+
 if [[ "$(deck version)" != *"v${DECK_VERSION}"* ]]; then
   echo "deck ${DECK_VERSION} is required" >&2
   exit 1
@@ -14,7 +26,7 @@ for stage in dev prod; do
   spec="openapi.yaml"
   select_tag="scope-${SERVICE}-${stage}"
   if [[ "${stage}" == "prod" ]]; then
-    spec="openapi/versions/0.1.0.yaml"
+    spec="${PRODUCTION_SPEC}"
     select_tag="env-prod"
   fi
 
