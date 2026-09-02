@@ -1,0 +1,75 @@
+_format_version: "3.0"
+_info:
+  select_tags:
+  - scope-flights-dev
+services:
+- host: api.kong-air.com
+  id: cb8e2e84-e115-52ff-bab2-3a202f534376
+  name: flights-dev
+  path: /
+  plugins: []
+  port: 443
+  protocol: https
+  routes:
+  - id: ffe246a3-1c3d-57a2-a692-4e93714e9aa9
+    methods:
+    - GET
+    name: flights-dev_get-flights
+    paths:
+    - ~/flights$
+    plugins: []
+    regex_priority: 200
+    strip_path: false
+    tags:
+    - env-dev
+    - team-flight-data
+    - owner-flights
+    - scope-flights-dev
+  - id: 29c748a7-92be-53eb-ab62-47893ba62d84
+    methods:
+    - GET
+    name: flights-dev_get-flight-by-number
+    paths:
+    - ~/flights/(?<flightnumber>[^#?/]+)$
+    plugins: []
+    regex_priority: 100
+    strip_path: false
+    tags:
+    - env-dev
+    - team-flight-data
+    - owner-flights
+    - scope-flights-dev
+  - id: 0b63279d-742c-5d6c-87f0-67177fa2ef60
+    methods:
+    - GET
+    name: flights-dev_get-flight-details
+    paths:
+    - ~/flights/(?<flightnumber>[^#?/]+)/details$
+    plugins: []
+    regex_priority: 100
+    strip_path: false
+    tags:
+    - env-dev
+    - team-flight-data
+    - owner-flights
+    - scope-flights-dev
+  - id: 9ea31883-d72a-5f29-bca4-eb3e92897221
+    methods:
+    - GET
+    name: flights-dev_flights-health-check
+    paths:
+    - ~/flights/health$
+    plugins: []
+    regex_priority: 200
+    strip_path: false
+    tags:
+    - env-dev
+    - team-flight-data
+    - owner-flights
+    - scope-flights-dev
+  tags:
+  - env-dev
+  - team-flight-data
+  - owner-flights
+  - scope-flights-dev
+upstreams: []

@@ -1,0 +1,61 @@
+name: Promote production Gateway candidate
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - gateway/prod/kong.yaml
+      - openapi/versions/**
+
+permissions:
+  contents: read
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out service repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          path: service
+      - name: Check out platform repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          repository: KongAirlines/platform
+          token: ${{ secrets.PLATFORM_PROMOTION_TOKEN }}
+          path: platform
+      - name: Copy candidate and record provenance
+        working-directory: platform
+        env:
+          SOURCE_REPOSITORY: ${{ github.repository }}
+          SOURCE_COMMIT: ${{ github.sha }}
+        run: |
+          cp ../service/gateway/prod/kong.yaml gateway/prod/flights.yaml
+          CHECKSUM="$(sha256sum gateway/prod/flights.yaml | cut -d ' ' -f1)"
+          printf '%s\n' \
+            "source_repository: ${SOURCE_REPOSITORY}" \
+            "source_commit: ${SOURCE_COMMIT}" \
+            "sha256: ${CHECKSUM}" \
+            'deck_version: 1.65.2' \
+            'kongctl_version: 1.14.0' \
+            > gateway/prod/flights.provenance.yaml
+      - name: Open platform review
+        uses: peter-evans/create-pull-request@22a9089034f40e5a961c8808d113e2c98fb63676 # v7
+        with:
+          path: platform
+          token: ${{ secrets.PLATFORM_PROMOTION_TOKEN }}
+          branch: promote/flights
+          delete-branch: true
+          commit-message: "gateway: promote Flights candidate"
+          title: "feat(gateway): promote Flights production candidate"
+          body: |
+            Promotes the exact Flights Gateway artifact from
+            `${{ github.repository }}@${{ github.sha }}`.
+
+            Review and merge this PR before manually applying the production
+            Catalog manifest from the same source commit.
+          add-paths: |
+            gateway/prod/flights.yaml
+            gateway/prod/flights.provenance.yaml
