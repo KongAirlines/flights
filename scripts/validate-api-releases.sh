@@ -4,6 +4,7 @@ set -euo pipefail
 readonly BASE_SHA="${1:-}"
 readonly STABLE_VERSION_PATTERN='^[0-9]+\.[0-9]+\.[0-9]+$'
 readonly BETA_VERSION_PATTERN='^[0-9]+\.[0-9]+\.[0-9]+-beta\.[0-9]+$'
+readonly PRODUCTION_SPEC_PATTERN='^\.\./openapi/versions/[0-9]+\.[0-9]+\.[0-9]+\.yaml$'
 
 spec_version() {
   awk '
@@ -21,6 +22,13 @@ spec_version() {
 development_version="$(spec_version openapi.yaml)"
 if [[ ! "${development_version}" =~ ${BETA_VERSION_PATTERN} ]]; then
   echo "openapi.yaml version must be a beta such as 0.2.0-beta.1" >&2
+  exit 1
+fi
+
+if [[ "$(grep -Fxc '    version: !file ../openapi.yaml#info.version' konnect/dev.yaml)" -ne 1 ||
+      "$(grep -Fxc '        version: !file ../openapi.yaml#info.version' konnect/dev.yaml)" -ne 1 ||
+      "$(grep -Fxc '        spec: !file ../openapi.yaml' konnect/dev.yaml)" -ne 1 ]]; then
+  echo "konnect/dev.yaml must use openapi.yaml as its API version and specification" >&2
   exit 1
 fi
 
@@ -71,6 +79,10 @@ for release_spec in "${release_specs[@]}"; do
 done
 
 while IFS= read -r declared_spec; do
+  if [[ ! "${declared_spec}" =~ ${PRODUCTION_SPEC_PATTERN} ]]; then
+    echo "production specifications must be stable files under openapi/versions: ${declared_spec}" >&2
+    exit 1
+  fi
   resolved_spec="${declared_spec#../}"
   if [[ ! -f "${resolved_spec}" ]]; then
     echo "konnect/prod.yaml references missing specification ${resolved_spec}" >&2
