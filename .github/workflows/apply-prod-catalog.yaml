@@ -25,8 +25,6 @@ jobs:
         run: test "$(git rev-parse HEAD)" = "${EXPECTED_COMMIT}"
       - name: Install kongctl
         uses: Kong/setup-kongctl@659d5c2b0f4db2e25d63797035358a22907421db # v1
-        with:
-          kongctl-version: "1.14.0"
       - name: Apply production Catalog state
         env:
           KONGCTL_DEFAULT_KONNECT_PAT: ${{ secrets.KONNECT_TOKEN }}

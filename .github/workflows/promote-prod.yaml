@@ -26,6 +26,8 @@ jobs:
           repository: KongAirlines/platform
           token: ${{ secrets.PLATFORM_PROMOTION_TOKEN }}
           path: platform
+      - name: Install latest stable kongctl
+        uses: Kong/setup-kongctl@659d5c2b0f4db2e25d63797035358a22907421db # v1
       - name: Copy candidate and record provenance
         working-directory: platform
         env:
@@ -34,12 +36,13 @@ jobs:
         run: |
           cp ../service/gateway/prod/kong.yaml gateway/prod/flights.yaml
           CHECKSUM="$(sha256sum gateway/prod/flights.yaml | cut -d ' ' -f1)"
+          KONGCTL_VERSION="$(kongctl version --output json | jq -r '.version')"
           printf '%s\n' \
             "source_repository: ${SOURCE_REPOSITORY}" \
             "source_commit: ${SOURCE_COMMIT}" \
             "sha256: ${CHECKSUM}" \
             'deck_version: 1.65.2' \
-            'kongctl_version: 1.14.0' \
+            "kongctl_version: ${KONGCTL_VERSION}" \
             > gateway/prod/flights.provenance.yaml
       - name: Open platform review
         uses: peter-evans/create-pull-request@22a9089034f40e5a961c8808d113e2c98fb63676 # v7
