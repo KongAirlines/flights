@@ -33,10 +33,20 @@ jobs:
           wrapper: false
       - name: Prepare release candidate
         run: ./scripts/prepare-release.sh "${{ inputs.release_version }}" "${{ inputs.next_development_version }}"
+      - name: Generate service automation token
+        id: app-token
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3
+        with:
+          client-id: ${{ vars.REFERENCE_PLATFORM_APP_CLIENT_ID }}
+          private-key: ${{ secrets.REFERENCE_PLATFORM_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ github.event.repository.name }}
+          permission-contents: write
+          permission-pull-requests: write
       - name: Open service release review
         uses: peter-evans/create-pull-request@22a9089034f40e5a961c8808d113e2c98fb63676 # v7
         with:
-          token: ${{ secrets.PLATFORM_PROMOTION_TOKEN }}
+          token: ${{ steps.app-token.outputs.token }}
           base: main
           branch: release/${{ inputs.release_version }}
           delete-branch: true

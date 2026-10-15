@@ -101,6 +101,6 @@ stable release version and the next development version. For example, releasing
 4. Regenerates the development and production Gateway artifacts.
 
 Merging that service PR applies the next beta to development and starts the
-existing governed production promotion. The trusted
-`PLATFORM_PROMOTION_TOKEN` must be able to push a release branch and open a PR
-in this service repository so normal pull-request validation runs.
+existing governed production promotion. The workflows use short-lived tokens
+from the organization-owned GitHub App configured by
+`REFERENCE_PLATFORM_APP_CLIENT_ID` and `REFERENCE_PLATFORM_APP_PRIVATE_KEY`.
