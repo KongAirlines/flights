@@ -101,4 +101,12 @@ if [[ -n "${BASE_SHA}" ]]; then
     echo "${changed_releases}" >&2
     exit 1
   fi
+
+  if ! git diff --quiet "${BASE_SHA}" -- openapi.yaml; then
+    base_development_version="$(git show "${BASE_SHA}:openapi.yaml" | spec_version /dev/stdin)"
+    if [[ "${development_version}" == "${base_development_version}" ]]; then
+      echo "openapi.yaml changed without advancing info.version from ${development_version}" >&2
+      exit 1
+    fi
+  fi
 fi

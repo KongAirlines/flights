@@ -76,6 +76,9 @@ state. It is an anonymous public-API example for the
 - The root [`openapi.yaml`](openapi.yaml) is the next beta contract, while
   [`openapi/versions/`](openapi/versions/) retains immutable stable releases.
 
+Advance the root `info.version` for every contract change. This creates a new
+Catalog API version instead of attempting to modify an ACE-protected version.
+
 Service developers work API-first by changing the root `openapi.yaml` or an
 explicit Gateway transformation input. Credential-free CI converts those
 inputs into decK state, validates it, and a separate trusted workflow commits
