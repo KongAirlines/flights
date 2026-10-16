@@ -6,8 +6,9 @@ on:
     branches:
       - main
     paths:
-      - gateway/prod/kong.yaml
+      - konnect/prod.yaml
       - openapi/versions/**
+      - scripts/generate-gateway.sh
 
 permissions:
   contents: read
@@ -20,6 +21,14 @@ jobs:
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           path: service
+      - name: Install decK
+        uses: Kong/setup-deck@6ea0a466ee5826ddb531cbe851ba8e5a77a0e041 # v1
+        with:
+          deck-version: "1.65.2"
+          wrapper: false
+      - name: Generate production Gateway candidate
+        working-directory: service
+        run: ./scripts/generate-gateway.sh
       - name: Generate platform automation token
         id: app-token
         uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3

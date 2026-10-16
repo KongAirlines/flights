@@ -4,7 +4,6 @@ on:
   pull_request:
     paths:
       - .github/workflows/**
-      - gateway/**
       - konnect/**
       - openapi.yaml
       - openapi/**
@@ -25,10 +24,8 @@ jobs:
         with:
           deck-version: "1.65.2"
           wrapper: false
-      - name: Regenerate Gateway state
+      - name: Generate ephemeral Gateway state
         run: ./scripts/generate-gateway.sh
-      - name: Check generated state is committed
-        run: git diff --exit-code -- gateway
       - name: Enforce Reference Platform ownership rules
         env:
           RELEASE_BASE_SHA: ${{ github.event.pull_request.base.sha }}

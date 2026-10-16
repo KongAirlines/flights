@@ -67,7 +67,7 @@ state. It is an anonymous public-API example for the
 [Konnect Reference Platform](https://developer.konghq.com/konnect-reference-platform/).
 
 - [`konnect/dev.yaml`](konnect/dev.yaml) owns the private development Catalog
-  API and applies this service's Gateway state to `flight-data-dev`.
+  API and synchronizes this service's Gateway state to `flight-data-dev`.
 - [`konnect/prod.yaml`](konnect/prod.yaml) owns the public production Catalog
   API. Production Gateway state is promoted to the
   [platform repository](https://github.com/KongAirlines/platform) for review.
@@ -76,16 +76,19 @@ state. It is an anonymous public-API example for the
 - The root [`openapi.yaml`](openapi.yaml) is the next beta contract, while
   [`openapi/versions/`](openapi/versions/) retains immutable stable releases.
 
-Install decK 1.65.2 and run `./scripts/generate-gateway.sh` after changing an
-OpenAPI document. Commit the generated development and production files. CI
-regenerates them and rejects drift.
+Service developers work API-first by changing the root `openapi.yaml`.
+CI converts the contract into ephemeral decK state, validates it, and
+synchronizes development so creates, updates, and deletions are reconciled.
+Generated Gateway files are not committed to this repository. Production
+automation generates the stable candidate and commits it to the platform
+repository for governed review.
 
 The deployment workflows intentionally install the latest stable kongctl
 release so this example continuously exercises current declarative behavior.
 
 ### Development and releases
 
-Normal service PRs edit the beta version in the root `openapi.yaml`. The API's
+Normal service PRs edit only the beta version in the root `openapi.yaml`. The API's
 top-level `version` in `konnect/prod.yaml` selects the stable specification
 used for production Catalog and Gateway state; generation scripts read that
 selector, so they never need a release-specific edit.
@@ -98,9 +101,9 @@ stable release version and the next development version. For example, releasing
 2. Sets `konnect/prod.yaml` current version to `0.2.0` while retaining older
    versions.
 3. Advances the root contract to `0.3.0-beta.1`.
-4. Regenerates the development and production Gateway artifacts.
+4. Lets CI generate and validate the development and production Gateway state.
 
-Merging that service PR applies the next beta to development and starts the
+Merging that service PR synchronizes the next beta to development and starts the
 existing governed production promotion. The workflows use short-lived tokens
 from the organization-owned GitHub App configured by
 `REFERENCE_PLATFORM_APP_CLIENT_ID` and `REFERENCE_PLATFORM_APP_PRIVATE_KEY`.

@@ -1,4 +1,4 @@
-name: Apply development desired state
+name: Sync development desired state
 
 on:
   workflow_dispatch:
@@ -6,9 +6,9 @@ on:
     branches:
       - main
     paths:
-      - gateway/dev/**
       - konnect/dev.yaml
       - openapi.yaml
+      - scripts/generate-gateway.sh
 
 permissions:
   contents: read
@@ -18,7 +18,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  apply:
+  sync:
     runs-on: ubuntu-latest
     environment: development
     steps:
@@ -30,7 +30,9 @@ jobs:
         with:
           deck-version: "1.65.2"
           wrapper: false
-      - name: Apply development Catalog and Gateway state
+      - name: Generate Gateway state from the API contract
+        run: ./scripts/generate-gateway.sh
+      - name: Sync development Catalog and Gateway state
         env:
           KONGCTL_DEFAULT_KONNECT_PAT: ${{ secrets.KONNECT_TOKEN }}
-        run: kongctl apply -f konnect/dev.yaml --base-dir . --auto-approve --require-namespace flights
+        run: kongctl sync -f konnect/dev.yaml --base-dir . --auto-approve --require-namespace flights

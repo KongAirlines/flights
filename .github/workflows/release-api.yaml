@@ -63,5 +63,3 @@ jobs:
             openapi.yaml
             openapi/versions/**
             konnect/prod.yaml
-            gateway/dev/kong.yaml
-            gateway/prod/kong.yaml
