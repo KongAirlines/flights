@@ -81,8 +81,11 @@ Catalog API version instead of modifying an existing version. The
 additive `konnect/dev-versions.yaml` manifest is applied before the remaining
 development state is synchronized; the sync manifest intentionally omits its
 `versions` collection so older development versions are not deleted. The
-following `kongctl sync` selects the new current version while reconciling the
-other authoritative development state.
+workflow then explicitly selects the new version before `kongctl sync`
+reconciles the other authoritative development state. This temporary
+[kongctl #2510](https://github.com/Kong/kongctl/issues/2510) workaround is
+required even though this API is public: its control-plane implementation is
+still governed by the platform-owned global ACE policy.
 
 Service developers work API-first by changing the root `openapi.yaml` or an
 explicit Gateway transformation input. Credential-free CI converts those
