@@ -22,6 +22,8 @@ if [[ "$(deck version)" != *"v${DECK_VERSION}"* ]]; then
   exit 1
 fi
 
+mkdir -p gateway/dev gateway/prod
+
 for stage in dev prod; do
   spec="openapi.yaml"
   select_tag="scope-${SERVICE}-${stage}"

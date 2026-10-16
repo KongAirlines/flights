@@ -26,9 +26,13 @@ if [[ ! "${development_version}" =~ ${BETA_VERSION_PATTERN} ]]; then
 fi
 
 if [[ "$(grep -Fxc '    version: !file ../openapi.yaml#info.version' konnect/dev.yaml)" -ne 1 ||
-      "$(grep -Fxc '        version: !file ../openapi.yaml#info.version' konnect/dev.yaml)" -ne 1 ||
-      "$(grep -Fxc '        spec: !file ../openapi.yaml' konnect/dev.yaml)" -ne 1 ]]; then
-  echo "konnect/dev.yaml must use openapi.yaml as its API version and specification" >&2
+      "$(grep -Fxc '        version: !file ../openapi.yaml#info.version' konnect/dev-versions.yaml)" -ne 1 ||
+      "$(grep -Fxc '        spec: !file ../openapi.yaml' konnect/dev-versions.yaml)" -ne 1 ]]; then
+  echo "development manifests must select and add the version from openapi.yaml" >&2
+  exit 1
+fi
+if grep -q '^[[:space:]]\{4\}versions:' konnect/dev.yaml; then
+  echo "konnect/dev.yaml must omit API versions so sync cannot delete version history" >&2
   exit 1
 fi
 
@@ -100,5 +104,13 @@ if [[ -n "${BASE_SHA}" ]]; then
     echo "released OpenAPI specifications are immutable:" >&2
     echo "${changed_releases}" >&2
     exit 1
+  fi
+
+  if ! git diff --quiet "${BASE_SHA}" -- openapi.yaml; then
+    base_development_version="$(git show "${BASE_SHA}:openapi.yaml" | spec_version /dev/stdin)"
+    if [[ "${development_version}" == "${base_development_version}" ]]; then
+      echo "openapi.yaml changed without advancing info.version from ${development_version}" >&2
+      exit 1
+    fi
   fi
 fi

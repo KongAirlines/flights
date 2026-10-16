@@ -67,7 +67,7 @@ state. It is an anonymous public-API example for the
 [Konnect Reference Platform](https://developer.konghq.com/konnect-reference-platform/).
 
 - [`konnect/dev.yaml`](konnect/dev.yaml) owns the private development Catalog
-  API and applies this service's Gateway state to `flight-data-dev`.
+  API and synchronizes this service's Gateway state to `flight-data-dev`.
 - [`konnect/prod.yaml`](konnect/prod.yaml) owns the public production Catalog
   API. Production Gateway state is promoted to the
   [platform repository](https://github.com/KongAirlines/platform) for review.
@@ -76,16 +76,37 @@ state. It is an anonymous public-API example for the
 - The root [`openapi.yaml`](openapi.yaml) is the next beta contract, while
   [`openapi/versions/`](openapi/versions/) retains immutable stable releases.
 
-Install decK 1.65.2 and run `./scripts/generate-gateway.sh` after changing an
-OpenAPI document. Commit the generated development and production files. CI
-regenerates them and rejects drift.
+Advance the root `info.version` for every contract change. This creates a new
+Catalog API version instead of modifying an existing version. The
+additive `konnect/dev-versions.yaml` manifest is applied before the remaining
+development state is synchronized; the sync manifest intentionally omits its
+`versions` collection so older development versions are not deleted. The
+workflow then explicitly selects the new version before `kongctl sync`
+reconciles the other authoritative development state. This temporary
+[kongctl #2510](https://github.com/Kong/kongctl/issues/2510) workaround is
+required even though this API is public: its control-plane implementation is
+still governed by the platform-owned global ACE policy.
+
+Service developers work API-first by changing the root `openapi.yaml` or an
+explicit Gateway transformation input. Credential-free CI converts those
+inputs into decK state, validates it, and a separate trusted workflow commits
+the materialized development and production files back to the same-repository
+PR. Reviewers therefore see the exact Gateway state alongside the contract
+change. The trusted workflow also maintains a PR comment summarizing changed
+inputs and the generated development and production Gateway diffs. Generated
+files are automation-owned and must not be edited directly.
+
+After merge, CI proves the committed files still match deterministic
+generation before synchronizing development. Production automation copies the
+exact committed stable candidate to the platform repository for governed
+review; it does not regenerate the candidate after review.
 
 The deployment workflows intentionally install the latest stable kongctl
 release so this example continuously exercises current declarative behavior.
 
 ### Development and releases
 
-Normal service PRs edit the beta version in the root `openapi.yaml`. The API's
+Normal service PRs edit only the beta version in the root `openapi.yaml`. The API's
 top-level `version` in `konnect/prod.yaml` selects the stable specification
 used for production Catalog and Gateway state; generation scripts read that
 selector, so they never need a release-specific edit.
@@ -98,9 +119,10 @@ stable release version and the next development version. For example, releasing
 2. Sets `konnect/prod.yaml` current version to `0.2.0` while retaining older
    versions.
 3. Advances the root contract to `0.3.0-beta.1`.
-4. Regenerates the development and production Gateway artifacts.
+4. Materializes and validates the development and production Gateway state in
+   the release PR.
 
-Merging that service PR applies the next beta to development and starts the
+Merging that service PR synchronizes the next beta to development and starts the
 existing governed production promotion. The workflows use short-lived tokens
 from the organization-owned GitHub App configured by
 `REFERENCE_PLATFORM_APP_CLIENT_ID` and `REFERENCE_PLATFORM_APP_PRIVATE_KEY`.

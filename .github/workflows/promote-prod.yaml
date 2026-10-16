@@ -7,7 +7,9 @@ on:
       - main
     paths:
       - gateway/prod/kong.yaml
+      - konnect/prod.yaml
       - openapi/versions/**
+      - scripts/generate-gateway.sh
 
 permissions:
   contents: read
@@ -38,7 +40,7 @@ jobs:
           path: platform
       - name: Install latest stable kongctl
         uses: Kong/setup-kongctl@659d5c2b0f4db2e25d63797035358a22907421db # v1
-      - name: Copy candidate and record provenance
+      - name: Copy reviewed candidate and record provenance
         working-directory: platform
         env:
           SOURCE_REPOSITORY: ${{ github.repository }}

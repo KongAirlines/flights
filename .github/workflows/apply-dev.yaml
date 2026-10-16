@@ -1,4 +1,4 @@
-name: Apply development desired state
+name: Sync development desired state
 
 on:
   workflow_dispatch:
@@ -6,9 +6,13 @@ on:
     branches:
       - main
     paths:
-      - gateway/dev/**
+      - .github/workflows/apply-dev.yaml
+      - gateway/dev/kong.yaml
       - konnect/dev.yaml
+      - konnect/dev-versions.yaml
       - openapi.yaml
+      - scripts/generate-gateway.sh
+      - scripts/transition-ace-api-version.sh
 
 permissions:
   contents: read
@@ -18,7 +22,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  apply:
+  sync:
     runs-on: ubuntu-latest
     environment: development
     steps:
@@ -30,7 +34,24 @@ jobs:
         with:
           deck-version: "1.65.2"
           wrapper: false
-      - name: Apply development Catalog and Gateway state
+      - name: Verify committed Gateway state matches the API contract
+        run: |
+          ./scripts/generate-gateway.sh
+          git diff --exit-code -- gateway/dev/kong.yaml gateway/prod/kong.yaml
+      - name: Add development API version
         env:
           KONGCTL_DEFAULT_KONNECT_PAT: ${{ secrets.KONNECT_TOKEN }}
-        run: kongctl apply -f konnect/dev.yaml --base-dir . --auto-approve --require-namespace flights
+        run: |
+          # Restore --require-namespace flights after kongctl #2503 is released.
+          kongctl apply -f konnect/dev-versions.yaml --base-dir . \
+            --auto-approve
+      - name: Transition ACE-governed API version
+        env:
+          KONGCTL_DEFAULT_KONNECT_PAT: ${{ secrets.KONNECT_TOKEN }}
+        # Temporary sequencing workaround for https://github.com/Kong/kongctl/issues/2510.
+        # Remove this step after declarative sync supports forced ACE version transitions.
+        run: ./scripts/transition-ace-api-version.sh "KongAir Flights - Development"
+      - name: Sync development Catalog and Gateway state
+        env:
+          KONGCTL_DEFAULT_KONNECT_PAT: ${{ secrets.KONNECT_TOKEN }}
+        run: kongctl sync -f konnect/dev.yaml --base-dir . --auto-approve --require-namespace flights

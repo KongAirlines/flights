@@ -1,4 +1,4 @@
-name: Apply production Catalog state
+name: Sync production Catalog state
 
 on:
   workflow_dispatch:
@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 jobs:
-  apply:
+  sync:
     runs-on: ubuntu-latest
     environment: production
     steps:
@@ -25,7 +25,7 @@ jobs:
         run: test "$(git rev-parse HEAD)" = "${EXPECTED_COMMIT}"
       - name: Install kongctl
         uses: Kong/setup-kongctl@659d5c2b0f4db2e25d63797035358a22907421db # v1
-      - name: Apply production Catalog state
+      - name: Sync production Catalog state
         env:
           KONGCTL_DEFAULT_KONNECT_PAT: ${{ secrets.KONNECT_TOKEN }}
-        run: kongctl apply -f konnect/prod.yaml --base-dir . --auto-approve --require-namespace flights
+        run: kongctl sync -f konnect/prod.yaml --base-dir . --auto-approve --require-namespace flights-prod
