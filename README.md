@@ -81,7 +81,9 @@ explicit Gateway transformation input. Credential-free CI converts those
 inputs into decK state, validates it, and a separate trusted workflow commits
 the materialized development and production files back to the same-repository
 PR. Reviewers therefore see the exact Gateway state alongside the contract
-change. Generated files are automation-owned and must not be edited directly.
+change. The trusted workflow also maintains a PR comment summarizing changed
+inputs and the generated development and production Gateway diffs. Generated
+files are automation-owned and must not be edited directly.
 
 After merge, CI proves the committed files still match deterministic
 generation before synchronizing development. Production automation copies the
