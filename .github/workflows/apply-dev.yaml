@@ -6,6 +6,7 @@ on:
     branches:
       - main
     paths:
+      - .github/workflows/apply-dev.yaml
       - gateway/dev/kong.yaml
       - konnect/dev.yaml
       - konnect/dev-versions.yaml
