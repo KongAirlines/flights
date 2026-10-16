@@ -12,7 +12,7 @@ servers:
   description: KongAir API Server
 
 paths:
-  /health:
+  /flights/health:
    get:
      summary: Health check endpoint
      description: Endpoint that returns the service health status.

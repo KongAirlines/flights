@@ -25,6 +25,20 @@ services:
     - team-flight-data
     - owner-flights
     - scope-flights-dev
+  - id: 9ea31883-d72a-5f29-bca4-eb3e92897221
+    methods:
+    - GET
+    name: flights-dev_flights-health-check
+    paths:
+    - ~/flights/health$
+    plugins: []
+    regex_priority: 200
+    strip_path: false
+    tags:
+    - env-dev
+    - team-flight-data
+    - owner-flights
+    - scope-flights-dev
   - id: 29c748a7-92be-53eb-ab62-47893ba62d84
     methods:
     - GET
@@ -47,20 +61,6 @@ services:
     - ~/flights/(?<flightnumber>[^#?/]+)/details$
     plugins: []
     regex_priority: 100
-    strip_path: false
-    tags:
-    - env-dev
-    - team-flight-data
-    - owner-flights
-    - scope-flights-dev
-  - id: 9ea31883-d72a-5f29-bca4-eb3e92897221
-    methods:
-    - GET
-    name: flights-dev_flights-health-check
-    paths:
-    - ~/flights/health$
-    plugins: []
-    regex_priority: 200
     strip_path: false
     tags:
     - env-dev
