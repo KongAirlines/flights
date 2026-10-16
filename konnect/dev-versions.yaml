@@ -1,0 +1,14 @@
+_defaults:
+  kongctl:
+    namespace: flights
+
+apis:
+  - ref: flights-dev-api
+    _external:
+      selector:
+        matchFields:
+          name: KongAir Flights - Development
+    versions:
+      - ref: flights-dev-current
+        version: !file ../openapi.yaml#info.version
+        spec: !file ../openapi.yaml

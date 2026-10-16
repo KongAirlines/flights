@@ -77,7 +77,12 @@ state. It is an anonymous public-API example for the
   [`openapi/versions/`](openapi/versions/) retains immutable stable releases.
 
 Advance the root `info.version` for every contract change. This creates a new
-Catalog API version instead of attempting to modify an ACE-protected version.
+Catalog API version instead of modifying an existing version. The
+additive `konnect/dev-versions.yaml` manifest is applied before the remaining
+development state is synchronized; the sync manifest intentionally omits its
+`versions` collection so older development versions are not deleted. The
+following `kongctl sync` selects the new current version while reconciling the
+other authoritative development state.
 
 Service developers work API-first by changing the root `openapi.yaml` or an
 explicit Gateway transformation input. Credential-free CI converts those
