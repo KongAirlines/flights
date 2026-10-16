@@ -8,6 +8,11 @@ readonly OBSOLETE_PATTERN='koct[l]|konnect-[o]rchestrator|ko-[p]atch'
 
 ./scripts/validate-api-releases.sh "${RELEASE_BASE_SHA:-}"
 
+if grep -Eq '^[[:space:]]{2}"?/(.*/)?(health|ready|live)"?:[[:space:]]*$' openapi.yaml; then
+  echo "openapi.yaml must describe only client-facing operations" >&2
+  exit 1
+fi
+
 if grep -q '^[[:space:]]*_deck:' konnect/prod.yaml; then
   echo "production Catalog manifests must not apply Gateway state" >&2
   exit 1
