@@ -76,12 +76,17 @@ state. It is an anonymous public-API example for the
 - The root [`openapi.yaml`](openapi.yaml) is the next beta contract, while
   [`openapi/versions/`](openapi/versions/) retains immutable stable releases.
 
-Service developers work API-first by changing the root `openapi.yaml`.
-CI converts the contract into ephemeral decK state, validates it, and
-synchronizes development so creates, updates, and deletions are reconciled.
-Generated Gateway files are not committed to this repository. Production
-automation generates the stable candidate and commits it to the platform
-repository for governed review.
+Service developers work API-first by changing the root `openapi.yaml` or an
+explicit Gateway transformation input. Credential-free CI converts those
+inputs into decK state, validates it, and a separate trusted workflow commits
+the materialized development and production files back to the same-repository
+PR. Reviewers therefore see the exact Gateway state alongside the contract
+change. Generated files are automation-owned and must not be edited directly.
+
+After merge, CI proves the committed files still match deterministic
+generation before synchronizing development. Production automation copies the
+exact committed stable candidate to the platform repository for governed
+review; it does not regenerate the candidate after review.
 
 The deployment workflows intentionally install the latest stable kongctl
 release so this example continuously exercises current declarative behavior.
@@ -101,7 +106,8 @@ stable release version and the next development version. For example, releasing
 2. Sets `konnect/prod.yaml` current version to `0.2.0` while retaining older
    versions.
 3. Advances the root contract to `0.3.0-beta.1`.
-4. Lets CI generate and validate the development and production Gateway state.
+4. Materializes and validates the development and production Gateway state in
+   the release PR.
 
 Merging that service PR synchronizes the next beta to development and starts the
 existing governed production promotion. The workflows use short-lived tokens

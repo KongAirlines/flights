@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - .github/workflows/**
+      - gateway/**
       - konnect/**
       - openapi.yaml
       - openapi/**
@@ -19,6 +20,7 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
       - name: Install decK
         uses: Kong/setup-deck@6ea0a466ee5826ddb531cbe851ba8e5a77a0e041 # v1
         with:
@@ -34,3 +36,14 @@ jobs:
         run: |
           deck file validate gateway/dev/kong.yaml
           deck file validate gateway/prod/kong.yaml
+      - name: Upload validated Gateway state
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: gateway-state
+          path: |
+            gateway/dev/kong.yaml
+            gateway/prod/kong.yaml
+          if-no-files-found: error
+          retention-days: 1
+      - name: Verify generated Gateway state is committed
+        run: git diff --exit-code -- gateway/dev/kong.yaml gateway/prod/kong.yaml

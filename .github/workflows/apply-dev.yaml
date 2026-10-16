@@ -6,6 +6,7 @@ on:
     branches:
       - main
     paths:
+      - gateway/dev/kong.yaml
       - konnect/dev.yaml
       - openapi.yaml
       - scripts/generate-gateway.sh
@@ -30,8 +31,10 @@ jobs:
         with:
           deck-version: "1.65.2"
           wrapper: false
-      - name: Generate Gateway state from the API contract
-        run: ./scripts/generate-gateway.sh
+      - name: Verify committed Gateway state matches the API contract
+        run: |
+          ./scripts/generate-gateway.sh
+          git diff --exit-code -- gateway/dev/kong.yaml gateway/prod/kong.yaml
       - name: Sync development Catalog and Gateway state
         env:
           KONGCTL_DEFAULT_KONNECT_PAT: ${{ secrets.KONNECT_TOKEN }}
