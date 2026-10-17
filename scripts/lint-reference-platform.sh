@@ -38,6 +38,11 @@ if grep -Fq 'name: ace' gateway/prod/kong.yaml; then
   exit 1
 fi
 
+if grep -Fq 'name: jwt' gateway/dev/kong.yaml gateway/prod/kong.yaml; then
+  echo "public example APIs must not require JWT authentication" >&2
+  exit 1
+fi
+
 if grep -ERin "${OBSOLETE_PATTERN}" README.md .github gateway konnect scripts; then
   echo "obsolete Reference Platform tooling is not allowed" >&2
   exit 1
