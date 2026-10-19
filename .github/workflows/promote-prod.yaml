@@ -69,8 +69,9 @@ jobs:
             Promotes the exact Flights Gateway artifact from
             `${{ github.repository }}@${{ github.sha }}`.
 
-            Review and merge this PR before manually applying the production
-            Catalog manifest from the same source commit.
+            After this PR merges, the Platform workflow synchronizes the
+            reviewed Gateway state. On success, it automatically dispatches
+            the production Catalog sync from this same source commit.
           add-paths: |
             gateway/prod/flights.yaml
             gateway/prod/flights.provenance.yaml
