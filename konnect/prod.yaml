@@ -13,6 +13,8 @@ apis:
   - ref: flights-prod-api
     name: KongAir Flights
     description: Production Catalog API owned by the Flights service team.
+    # Authorize ACE-mapped operation removal during API updates (kongctl >= 1.21).
+    force_delete: true
     version: 0.2.0
     versions:
       - ref: flights-prod-0-1-0

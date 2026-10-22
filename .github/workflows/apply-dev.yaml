@@ -12,7 +12,6 @@ on:
       - konnect/dev-versions.yaml
       - openapi.yaml
       - scripts/generate-gateway.sh
-      - scripts/transition-ace-api-version.sh
 
 permissions:
   contents: read

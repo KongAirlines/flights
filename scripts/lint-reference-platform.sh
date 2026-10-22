@@ -24,6 +24,10 @@ if grep -q '^plugins:' gateway/prod/kong.yaml; then
 fi
 
 for stage in dev prod; do
+  if ! grep -Eq '^    force_delete: true$' "konnect/${stage}.yaml"; then
+    echo "managed APIs must authorize ACE operation removal with force_delete (kongctl >= 1.21)" >&2
+    exit 1
+  fi
   file="gateway/${stage}/kong.yaml"
   for tag in "env-${stage}" "team-${TEAM}" "owner-${OWNER}" "scope-${SCOPE}-${stage}"; do
     grep -Fq -- "- ${tag}" "${file}" || {

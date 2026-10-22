@@ -77,15 +77,18 @@ state. It is an anonymous public-API example for the
   [`openapi/versions/`](openapi/versions/) retains immutable stable releases.
 
 Advance the root `info.version` for every contract change. This creates a new
-Catalog API version instead of modifying an existing version. The
-additive `konnect/dev-versions.yaml` manifest is applied before the remaining
-development state is synchronized; the sync manifest intentionally omits its
-`versions` collection so older development versions are not deleted. The
-workflow then explicitly selects the new version before `kongctl sync`
-reconciles the other authoritative development state. This temporary
-[kongctl #2510](https://github.com/Kong/kongctl/issues/2510) workaround is
-required even though this API is public: its control-plane implementation is
-still governed by the platform-owned global ACE policy.
+Catalog API version instead of modifying an existing version. The additive
+`konnect/dev-versions.yaml` manifest is applied before development state is
+synchronized; the sync manifest intentionally omits `versions` so older
+development versions are retained.
+
+The managed development and production APIs declare `force_delete: true`,
+using kongctl 1.21 or newer to authorize updates that remove ACE-mapped
+operations. This does not request API deletion or disable application access
+control. The authorization remains enabled while the field is present.
+kongctl now selects the current version declaratively; no imperative
+transition script is needed. This also applies to public APIs linked to an
+ACE-enabled control plane, regardless of application-auth strategy selection.
 
 Service developers work API-first by changing the root `openapi.yaml` or an
 explicit Gateway transformation input. Credential-free CI converts those
