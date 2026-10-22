@@ -44,12 +44,6 @@ jobs:
           # Restore --require-namespace flights after kongctl #2503 is released.
           kongctl apply -f konnect/dev-versions.yaml --base-dir . \
             --auto-approve
-      - name: Transition ACE-governed API version
-        env:
-          KONGCTL_DEFAULT_KONNECT_PAT: ${{ secrets.KONNECT_TOKEN }}
-        # Temporary sequencing workaround for https://github.com/Kong/kongctl/issues/2510.
-        # Remove this step after declarative sync supports forced ACE version transitions.
-        run: ./scripts/transition-ace-api-version.sh "KongAir Flights - Development"
       - name: Sync development Catalog and Gateway state
         env:
           KONGCTL_DEFAULT_KONNECT_PAT: ${{ secrets.KONNECT_TOKEN }}
