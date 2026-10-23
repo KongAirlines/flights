@@ -18,6 +18,8 @@ apis:
   - ref: flights-dev-api
     name: KongAir Flights - Development
     description: Development Catalog API owned by the Flights service team.
+    # Authorize ACE-mapped operation removal during API updates (kongctl >= 1.21).
+    force_delete: true
     version: !file ../openapi.yaml#info.version
     publications:
       - ref: flights-dev-publication
