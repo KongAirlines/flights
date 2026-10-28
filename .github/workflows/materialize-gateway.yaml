@@ -139,6 +139,8 @@ jobs:
             echo '```text'
             git diff --name-status "${BASE_SHA}...${current_sha}" -- \
               openapi.yaml openapi/ konnect/ scripts/ .github/workflows/
+            git diff --name-status "${BASE_SHA}...${current_sha}" -- \
+              gateway/prod/upstream.yaml
             echo '```'
             echo
             echo '### Generated Gateway changes'
