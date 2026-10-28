@@ -1,0 +1,10 @@
+# Deployment-specific upstream; keep public server URLs in the OpenAPI contract.
+# This private name must resolve from every production data plane.
+_format_version: "1.0"
+patches:
+  - selectors:
+      - $..services[*]
+    values:
+      host: services.internal.kong-air.com
+      port: 8080
+      protocol: http

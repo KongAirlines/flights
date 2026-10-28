@@ -54,9 +54,18 @@ for stage in dev prod; do
     --selector '$..routes[?(@.paths[0]=="~/health$")]' \
     --value 'paths:["~/flights/health$"]' \
     --output-file "${tmp_dir}/routed.yaml"
+  gateway_state="${tmp_dir}/routed.yaml"
+  if [[ "${stage}" == "prod" ]]; then
+    deck file patch \
+      --analytics=false \
+      --state "${gateway_state}" \
+      --output-file "${tmp_dir}/upstream.yaml" \
+      gateway/prod/upstream.yaml
+    gateway_state="${tmp_dir}/upstream.yaml"
+  fi
   deck file add-tags \
     --analytics=false \
-    --state "${tmp_dir}/routed.yaml" \
+    --state "${gateway_state}" \
     --output-file "gateway/${stage}/kong.yaml" \
     "${tags[@]}"
   deck file validate "gateway/${stage}/kong.yaml"

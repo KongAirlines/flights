@@ -3,13 +3,13 @@ _info:
   select_tags:
   - env-prod
 services:
-- host: api.kong-air.com
+- host: services.internal.kong-air.com
   id: 0bee8855-858f-57a9-ad6d-bdfb1f59f9a8
   name: flights-prod
   path: /
   plugins: []
-  port: 443
-  protocol: https
+  port: 8080
+  protocol: http
   routes:
   - id: df56f919-0f45-51cf-8bcc-af7d5c7a2dc3
     methods:

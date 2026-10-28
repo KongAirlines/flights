@@ -107,6 +107,16 @@ review; it does not regenerate the candidate after review.
 The deployment workflows intentionally install the latest stable kongctl
 release so this example continuously exercises current declarative behavior.
 
+### Production backend connectivity
+
+[`gateway/prod/upstream.yaml`](gateway/prod/upstream.yaml) is a standard decK
+patch applied during production Gateway generation. It supplies the private
+backend hostname, protocol, and port without changing the client-facing OpenAPI
+server URL. Adapt these values to your deployment; every production data plane
+must be able to resolve and reach that backend. Changing this patch follows the
+same generated-state PR review and Platform promotion as other Gateway inputs.
+The development upstream is unchanged during this production migration.
+
 ### Development and releases
 
 Normal service PRs edit only the beta version in the root `openapi.yaml`. The API's
