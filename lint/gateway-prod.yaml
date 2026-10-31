@@ -1,0 +1,56 @@
+---
+extends:
+- "./lint/gateway-common.yaml"
+rules:
+  gateway-selector:
+    description: 'gateway-selector: preserve the source reconciliation boundary'
+    severity: error
+    given: "$"
+    then:
+      function: schema
+      functionOptions:
+        forceValidationOnCurrentNode: true
+        schema:
+          type: object
+          required:
+          - _info
+          properties:
+            _info:
+              type: object
+              required:
+              - select_tags
+              properties:
+                select_tags:
+                  const:
+                  - env-prod
+  gateway-entity-tags:
+    description: 'gateway-entity-tags: every entity needs environment and ownership
+      tags'
+    severity: error
+    given:
+    - "$.services[*]"
+    - "$..routes[*]"
+    - "$..plugins[*]"
+    - "$.consumers[*]"
+    - "$.upstreams[*]"
+    - "$..targets[*]"
+    then:
+      function: schema
+      functionOptions:
+        forceValidationOnCurrentNode: true
+        schema:
+          type: object
+          required:
+          - tags
+          properties:
+            tags:
+              type: array
+              allOf:
+              - contains:
+                  const: env-prod
+              - contains:
+                  const: team-flight-data
+              - contains:
+                  const: owner-flights
+              - contains:
+                  const: scope-flights-prod

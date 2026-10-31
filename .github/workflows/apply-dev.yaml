@@ -37,6 +37,11 @@ jobs:
         run: |
           ./scripts/generate-gateway.sh
           git diff --exit-code -- gateway/dev/kong.yaml gateway/prod/kong.yaml
+      - name: Lint development manifests before synchronization
+        run: |
+          kongctl lint -f openapi.yaml -r lint/openapi.yaml --fail-severity error
+          kongctl lint -f konnect/dev.yaml -r lint/konnect-dev.yaml --fail-severity error
+          deck file lint --analytics=false --state gateway/dev/kong.yaml lint/gateway-dev.yaml
       - name: Add development API version
         env:
           KONGCTL_DEFAULT_KONNECT_PAT: ${{ secrets.KONNECT_TOKEN }}

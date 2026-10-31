@@ -1,0 +1,30 @@
+---
+rules:
+  current-contract:
+    description: 'current-contract: beta development version and client-facing paths
+      only'
+    severity: error
+    given: "$"
+    then:
+      function: schema
+      functionOptions:
+        forceValidationOnCurrentNode: true
+        schema:
+          type: object
+          required:
+          - info
+          - paths
+          properties:
+            info:
+              type: object
+              required:
+              - version
+              properties:
+                version:
+                  type: string
+                  pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+-beta\\.[0-9]+$"
+            paths:
+              type: object
+              propertyNames:
+                not:
+                  pattern: "(^|/)(health|ready|live)/?$"

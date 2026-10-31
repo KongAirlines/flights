@@ -1,53 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-readonly TEAM="flight-data"
-readonly OWNER="flights"
-readonly SCOPE="flights"
-readonly OBSOLETE_PATTERN='koct[l]|konnect-[o]rchestrator|ko-[p]atch'
-
 ./scripts/validate-api-releases.sh "${RELEASE_BASE_SHA:-}"
-
-if grep -Eq '^[[:space:]]{2}"?/(.*/)?(health|ready|live)"?:[[:space:]]*$' openapi.yaml; then
-  echo "openapi.yaml must describe only client-facing operations" >&2
-  exit 1
-fi
-
-if grep -q '^[[:space:]]*_deck:' konnect/prod.yaml; then
-  echo "production Catalog manifests must not apply Gateway state" >&2
-  exit 1
-fi
-
-if grep -q '^plugins:' gateway/prod/kong.yaml; then
-  echo "service production state must not declare global plugins" >&2
-  exit 1
-fi
-
+kongctl lint -f openapi.yaml -r lint/openapi.yaml --fail-severity error
 for stage in dev prod; do
-  if ! grep -Eq '^    force_delete: true$' "konnect/${stage}.yaml"; then
-    echo "managed APIs must authorize ACE operation removal with force_delete (kongctl >= 1.21)" >&2
-    exit 1
-  fi
-  file="gateway/${stage}/kong.yaml"
-  for tag in "env-${stage}" "team-${TEAM}" "owner-${OWNER}" "scope-${SCOPE}-${stage}"; do
-    grep -Fq -- "- ${tag}" "${file}" || {
-      echo "${file} is missing ownership tag ${tag}" >&2
-      exit 1
-    }
-  done
+  kongctl lint -f "konnect/${stage}.yaml" -r "lint/konnect-${stage}.yaml" --fail-severity error
 done
+bash scripts/lint-gateway.sh
 
-if grep -Fq 'name: ace' gateway/prod/kong.yaml; then
-  echo "public example APIs must not install ACE" >&2
-  exit 1
-fi
-
-if grep -Fq 'name: jwt' gateway/dev/kong.yaml gateway/prod/kong.yaml; then
-  echo "public example APIs must not require JWT authentication" >&2
-  exit 1
-fi
-
-if grep -ERin "${OBSOLETE_PATTERN}" README.md .github gateway konnect scripts; then
+# General repository text policy, outside manifest linting.
+if grep -ERin 'koct[l]|konnect-[o]rchestrator|ko-[p]atch' README.md .github gateway konnect scripts; then
   echo "obsolete Reference Platform tooling is not allowed" >&2
   exit 1
 fi

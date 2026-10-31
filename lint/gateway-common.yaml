@@ -1,0 +1,33 @@
+---
+rules:
+  service-no-global-plugins:
+    description: 'service-no-global-plugins: service repositories cannot install global
+      plugins'
+    severity: error
+    given: "$"
+    then:
+      function: schema
+      functionOptions:
+        forceValidationOnCurrentNode: true
+        schema:
+          not:
+            required:
+            - plugins
+  service-no-platform-auth:
+    description: 'service-no-platform-auth: ACE belongs to the platform; JWT is retired'
+    severity: error
+    given: "$..plugins[*]"
+    then:
+      function: schema
+      functionOptions:
+        forceValidationOnCurrentNode: true
+        schema:
+          type: object
+          required:
+          - name
+          properties:
+            name:
+              not:
+                enum:
+                - ace
+                - jwt
