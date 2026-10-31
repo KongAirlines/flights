@@ -1,0 +1,197 @@
+[
+{
+  "tool": "deck",
+  "rules": "lint/gateway-dev.yaml",
+  "document": {
+    "_format_version": "3.0",
+    "_info": {
+      "select_tags": [
+        "scope-flights-dev"
+      ]
+    },
+    "services": [
+      {
+        "name": "example",
+        "tags": [
+          "env-dev",
+          "team-flight-data",
+          "owner-flights",
+          "scope-flights-dev"
+        ],
+        "routes": [
+          {
+            "name": "example",
+            "tags": [
+              "env-dev",
+              "team-flight-data",
+              "owner-flights",
+              "scope-flights-dev"
+            ]
+          }
+        ],
+        "plugins": [
+          {
+            "name": "rate-limiting",
+            "tags": [
+              "env-dev",
+              "team-flight-data",
+              "owner-flights",
+              "scope-flights-dev"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "cases": [
+    {"name": "quoted root plugins", "rule": "service-no-global-plugins", "changes": [{"path": ["plugins"], "value": [{"name": "rate-limiting"}]}]},
+    {"name": "nested ACE", "rule": "service-no-platform-auth", "changes": [{"path": ["services", 0, "plugins", 0, "name"], "value": "ace"}]},
+    {"name": "nested JWT", "rule": "service-no-platform-auth", "changes": [{"path": ["services", 0, "plugins", 0, "name"], "value": "jwt"}]},
+    {"name": "missing selector", "rule": "gateway-selector", "changes": [{"path": ["_info"], "delete": true}]},
+    {"name": "extra selector", "rule": "gateway-selector", "changes": [{"path": ["_info", "select_tags"], "value": ["scope-flights-dev", "unexpected"]}]},
+    {"name": "missing whole route tags", "rule": "gateway-entity-tags", "changes": [{"path": ["services", 0, "routes", 0, "tags"], "delete": true}]},
+    {"name": "missing tag env-dev", "rule": "gateway-entity-tags", "changes": [{"path": ["services", 0, "routes", 0, "tags"], "value": ["team-flight-data", "owner-flights", "scope-flights-dev"]}]},
+    {"name": "missing tag team-flight-data", "rule": "gateway-entity-tags", "changes": [{"path": ["services", 0, "routes", 0, "tags"], "value": ["env-dev", "owner-flights", "scope-flights-dev"]}]},
+    {"name": "missing tag owner-flights", "rule": "gateway-entity-tags", "changes": [{"path": ["services", 0, "routes", 0, "tags"], "value": ["env-dev", "team-flight-data", "scope-flights-dev"]}]},
+    {"name": "missing tag scope-flights-dev", "rule": "gateway-entity-tags", "changes": [{"path": ["services", 0, "routes", 0, "tags"], "value": ["env-dev", "team-flight-data", "owner-flights"]}]}
+  ]
+},
+{
+  "tool": "kongctl",
+  "rules": "lint/konnect-dev.yaml",
+  "document": {
+    "control_planes": [
+      {
+        "_external": {
+          "selector": {}
+        }
+      }
+    ],
+    "apis": [
+      {
+        "force_delete": true,
+        "publications": [
+          {}
+        ]
+      }
+    ]
+  },
+  "cases": [
+    {"name": "false force_delete", "rule": "service-catalog-policy", "changes": [{"path": ["apis", 0, "force_delete"], "value": false}]},
+    {"name": "missing force_delete", "rule": "service-catalog-policy", "changes": [{"path": ["apis", 0, "force_delete"], "delete": true}]},
+    {"name": "string force_delete", "rule": "service-catalog-policy", "changes": [{"path": ["apis", 0, "force_delete"], "value": "true"}]},
+    {"name": "second API invalid", "rule": "service-catalog-policy", "changes": [{"path": ["apis"], "value": [{"force_delete": true, "publications": [{}]}, {"force_delete": false, "publications": [{}]}]}]},
+    {"name": "missing publications", "rule": "service-catalog-policy", "changes": [{"path": ["apis", 0, "publications"], "delete": true}]},
+    {"name": "managed control plane", "rule": "service-catalog-policy", "changes": [{"path": ["control_planes", 0, "_external"], "delete": true}]},
+    {"name": "public publication cannot require credentials", "rule": "service-catalog-policy", "changes": [{"path": ["apis", 0, "publications", 0, "auth_strategy_ids"], "value": [{"name": "unexpected"}]}]},
+    {"name": "sync must not prune development versions", "rule": "service-catalog-policy", "changes": [{"path": ["apis", 0, "versions"], "value": []}]}
+  ]
+},
+{
+  "tool": "deck",
+  "rules": "lint/gateway-prod.yaml",
+  "document": {
+    "_format_version": "3.0",
+    "_info": {
+      "select_tags": [
+        "env-prod"
+      ]
+    },
+    "services": [
+      {
+        "name": "example",
+        "tags": [
+          "env-prod",
+          "team-flight-data",
+          "owner-flights",
+          "scope-flights-prod"
+        ],
+        "routes": [
+          {
+            "name": "example",
+            "tags": [
+              "env-prod",
+              "team-flight-data",
+              "owner-flights",
+              "scope-flights-prod"
+            ]
+          }
+        ],
+        "plugins": [
+          {
+            "name": "rate-limiting",
+            "tags": [
+              "env-prod",
+              "team-flight-data",
+              "owner-flights",
+              "scope-flights-prod"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "cases": [
+    {"name": "quoted root plugins", "rule": "service-no-global-plugins", "changes": [{"path": ["plugins"], "value": [{"name": "rate-limiting"}]}]},
+    {"name": "nested ACE", "rule": "service-no-platform-auth", "changes": [{"path": ["services", 0, "plugins", 0, "name"], "value": "ace"}]},
+    {"name": "nested JWT", "rule": "service-no-platform-auth", "changes": [{"path": ["services", 0, "plugins", 0, "name"], "value": "jwt"}]},
+    {"name": "missing selector", "rule": "gateway-selector", "changes": [{"path": ["_info"], "delete": true}]},
+    {"name": "extra selector", "rule": "gateway-selector", "changes": [{"path": ["_info", "select_tags"], "value": ["env-prod", "unexpected"]}]},
+    {"name": "missing whole route tags", "rule": "gateway-entity-tags", "changes": [{"path": ["services", 0, "routes", 0, "tags"], "delete": true}]},
+    {"name": "missing tag env-prod", "rule": "gateway-entity-tags", "changes": [{"path": ["services", 0, "routes", 0, "tags"], "value": ["team-flight-data", "owner-flights", "scope-flights-prod"]}]},
+    {"name": "missing tag team-flight-data", "rule": "gateway-entity-tags", "changes": [{"path": ["services", 0, "routes", 0, "tags"], "value": ["env-prod", "owner-flights", "scope-flights-prod"]}]},
+    {"name": "missing tag owner-flights", "rule": "gateway-entity-tags", "changes": [{"path": ["services", 0, "routes", 0, "tags"], "value": ["env-prod", "team-flight-data", "scope-flights-prod"]}]},
+    {"name": "missing tag scope-flights-prod", "rule": "gateway-entity-tags", "changes": [{"path": ["services", 0, "routes", 0, "tags"], "value": ["env-prod", "team-flight-data", "owner-flights"]}]}
+  ]
+},
+{
+  "tool": "kongctl",
+  "rules": "lint/konnect-prod.yaml",
+  "document": {
+    "control_planes": [
+      {
+        "_external": {
+          "selector": {}
+        }
+      }
+    ],
+    "apis": [
+      {
+        "force_delete": true,
+        "publications": [
+          {}
+        ]
+      }
+    ]
+  },
+  "cases": [
+    {"name": "false force_delete", "rule": "service-catalog-policy", "changes": [{"path": ["apis", 0, "force_delete"], "value": false}]},
+    {"name": "missing force_delete", "rule": "service-catalog-policy", "changes": [{"path": ["apis", 0, "force_delete"], "delete": true}]},
+    {"name": "string force_delete", "rule": "service-catalog-policy", "changes": [{"path": ["apis", 0, "force_delete"], "value": "true"}]},
+    {"name": "second API invalid", "rule": "service-catalog-policy", "changes": [{"path": ["apis"], "value": [{"force_delete": true, "publications": [{}]}, {"force_delete": false, "publications": [{}]}]}]},
+    {"name": "missing publications", "rule": "service-catalog-policy", "changes": [{"path": ["apis", 0, "publications"], "delete": true}]},
+    {"name": "managed control plane", "rule": "service-catalog-policy", "changes": [{"path": ["control_planes", 0, "_external"], "delete": true}]},
+    {"name": "public publication cannot require credentials", "rule": "service-catalog-policy", "changes": [{"path": ["apis", 0, "publications", 0, "auth_strategy_ids"], "value": [{"name": "unexpected"}]}]},
+    {"name": "production cannot write Gateway", "rule": "service-catalog-policy", "changes": [{"path": ["control_planes", 0, "_deck"], "value": {"files": ["unexpected"]}}]}
+  ]
+},
+{
+  "tool": "kongctl",
+  "rules": "lint/openapi.yaml",
+  "document": {
+    "info": {
+      "version": "0.5.0-beta.1"
+    },
+    "paths": {
+      "/flights": {}
+    }
+  },
+  "cases": [
+    {"name": "stable development version", "rule": "current-contract", "changes": [{"path": ["info", "version"], "value": "0.5.0"}]},
+    {"name": "missing version", "rule": "current-contract", "changes": [{"path": ["info", "version"], "delete": true}]},
+    {"name": "internal /health", "rule": "current-contract", "changes": [{"path": ["paths", "/health"], "value": {}}]},
+    {"name": "internal /internal/ready", "rule": "current-contract", "changes": [{"path": ["paths", "/internal/ready"], "value": {}}]},
+    {"name": "internal /live/", "rule": "current-contract", "changes": [{"path": ["paths", "/live/"], "value": {}}]}
+  ]
+}
+]

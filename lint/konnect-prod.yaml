@@ -1,0 +1,53 @@
+---
+rules:
+  service-catalog-policy:
+    description: 'service-catalog-policy: managed API reconciliation, publication
+      auth and federated Gateway ownership'
+    severity: error
+    given: "$"
+    then:
+      function: schema
+      functionOptions:
+        forceValidationOnCurrentNode: true
+        schema:
+          type: object
+          required:
+          - apis
+          - control_planes
+          properties:
+            apis:
+              type: array
+              items:
+                type: object
+                required:
+                - force_delete
+                - publications
+                properties:
+                  force_delete:
+                    type: boolean
+                    const: true
+                  publications:
+                    type: array
+                    items:
+                      type: object
+                      not:
+                        required:
+                        - auth_strategy_ids
+                    minItems: 1
+              minItems: 1
+            control_planes:
+              type: array
+              items:
+                type: object
+                required:
+                - _external
+                properties:
+                  _external:
+                    type: object
+                not:
+                  required:
+                  - _deck
+              minItems: 1
+          not:
+            required:
+            - _deck

@@ -139,3 +139,9 @@ Merging that service PR synchronizes the next beta to development and starts the
 existing governed production promotion. The workflows use short-lived tokens
 from the organization-owned GitHub App configured by
 `REFERENCE_PLATFORM_APP_CLIENT_ID` and `REFERENCE_PLATFORM_APP_PRIVATE_KEY`.
+
+### Configuration linting
+
+See [native lint policies](lint/README.md) for the credential-free kongctl and
+decK checks, regression cases, and the release checks that compare files and Git
+history. PR validation runs these checks before uploading generated state.

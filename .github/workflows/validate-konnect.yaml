@@ -6,6 +6,7 @@ on:
       - .github/workflows/**
       - gateway/**
       - konnect/**
+      - lint/**
       - openapi.yaml
       - openapi/**
       - scripts/**
@@ -21,14 +22,20 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha }}
+      - name: Install kongctl
+        uses: Kong/setup-kongctl@659d5c2b0f4db2e25d63797035358a22907421db # v1; latest stable
       - name: Install decK
         uses: Kong/setup-deck@6ea0a466ee5826ddb531cbe851ba8e5a77a0e041 # v1
         with:
           deck-version: "1.65.2"
           wrapper: false
+      - name: Test native lint policies
+        run: |
+          python3 scripts/test-lint-policies.py
+          python3 scripts/test-release-consistency.py
       - name: Generate ephemeral Gateway state
         run: ./scripts/generate-gateway.sh
-      - name: Enforce Reference Platform ownership rules
+      - name: Lint manifests and validate release history
         env:
           RELEASE_BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: ./scripts/lint-reference-platform.sh
